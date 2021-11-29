@@ -94,20 +94,21 @@ void main(int argc, char** argv){
             //? setting l flag to true
             l = 1 ;
 			printf("\n\n-len\n"); //TODO: DELETE
-
-			// strcpy(holding, argv[k+1]);
+			
+			//? grabbing the hole line with lengths inputed by the user
 			holding = argv[k+1];
-			printf("holding = %s\n", holding); //TODO: DELETE
+
 			//? grab the next number inputed by the user
 			lenOfWordByUserInput = strtok(holding, ",");
-			printf("lenOfWordByUserInput = %d\n", atoi(lenOfWordByUserInput)); //TODO: DELETE
-
-			//? add it to the array that will hold the lenghts inputed by the user
-			lengths[currIndexOfLEngths++] = atoi(lenOfWordByUserInput);
+			
+			while ( !(lenOfWordByUserInput = strtok(holding, ",")) ) 
+			{
+				printf("HELLO\n"); //TODO: DELETE
+				//? add it to the array that will hold the lenghts inputed by the user
+				lengths[currIndexOfLEngths++] = atoi(lenOfWordByUserInput);
+			}
 			printf("lengths[0] = %d\n", lengths[0]); //TODO: DELETE
 
-            //? getting the name for the first player.
-            // strcpy(holding, argv[k+1]);
         }
         else if ( strcmp(argv[k], "-nthreads") == 0 )
         {
