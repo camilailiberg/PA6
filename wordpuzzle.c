@@ -91,23 +91,27 @@ void main(int argc, char** argv){
     {
         if ( strcmp(argv[k], "-len") == 0 )
         {
+			printf("\n\n-len\n"); //TODO: DELETE
+
             //? setting l flag to true
             l = 1 ;
-			printf("\n\n-len\n"); //TODO: DELETE
-			
+
 			//? grabbing the hole line with lengths inputed by the user
 			holding = argv[k+1];
-
+			printf("\nholding = %s\n", holding); //TODO: DELETE
 			//? grab the next number inputed by the user
 			lenOfWordByUserInput = strtok(holding, ",");
-			
-			while ( !(lenOfWordByUserInput = strtok(holding, ",")) ) 
+			printf("\nlenOfWordByUserInput = %d\n", atoi(lenOfWordByUserInput)); //TODO: DELETE
+
+			//? add it to the array that will hold the lenghts inputed by the user
+
+			while(lenOfWordByUserInput != NULL)
 			{
-				printf("HELLO\n"); //TODO: DELETE
-				//? add it to the array that will hold the lenghts inputed by the user
 				lengths[currIndexOfLEngths++] = atoi(lenOfWordByUserInput);
+				lenOfWordByUserInput = strtok(NULL, ",");
 			}
-			printf("lengths[0] = %d\n", lengths[0]); //TODO: DELETE
+			printf("\nlengths[0] = %d\n", lengths[0]); //TODO: DELETE
+			printf("lengths[1] = %d\n", lengths[1]); //TODO: DELETE
 
         }
         else if ( strcmp(argv[k], "-nthreads") == 0 )
@@ -132,6 +136,7 @@ void main(int argc, char** argv){
         } 
         k++;
     }
+	printf("\n\n--------------------------------------------------\n\n"); //TODO: DELETE
 	
 	//* Reading the dict.txt file and storing all of the words from dict.txt in the array dict
 	FILE* f = fopen("dict.txt", "r"); //? opening file in reading mode
