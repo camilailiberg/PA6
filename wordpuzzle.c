@@ -103,13 +103,16 @@ void main(int argc, char** argv){
 			lenOfWordByUserInput = strtok(holding, ",");
 			printf("\nlenOfWordByUserInput = %d\n", atoi(lenOfWordByUserInput)); //TODO: DELETE
 
-			//? add it to the array that will hold the lenghts inputed by the user
 
+			//? adds all of the lengths inputed by the user to the array lengths
+			//! KEEP IN MIND: currIndexOfLEngths will be correct for humans in terms of the lenght of the array lengths but index wise it will be one more.
 			while(lenOfWordByUserInput != NULL)
 			{
 				lengths[currIndexOfLEngths++] = atoi(lenOfWordByUserInput);
 				lenOfWordByUserInput = strtok(NULL, ",");
 			}
+
+			printf("\ncurrIndexOfLEngths = %d\n", currIndexOfLEngths); //TODO: DELETE
 			printf("\nlengths[0] = %d\n", lengths[0]); //TODO: DELETE
 			printf("lengths[1] = %d\n", lengths[1]); //TODO: DELETE
 
