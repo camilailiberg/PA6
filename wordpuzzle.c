@@ -13,6 +13,8 @@ int nt = 0 ;
 int v = 0 ;
 int t = 0 ;
 
+int currIndexOfLengths = 0, numOfThreads = 1, lengths[1000], lengthsDefault[] = {8,9} ;
+
 char ** allFoundWords;
 int currentIndexOfAllFoundWords;
 long timer, totalBinarySearchTime;
@@ -94,9 +96,11 @@ void main(int argc, char** argv){
 	//? lenOfWordByUserInput:
 	char * pointer, *holding, *holdingNThreads, *lenOfWordByUserInput ; 
 	//? lengths: array of integers that will hold the lengths inputed by the user after command line argument -len
-	int lengths[1000], lengthsDefault[] = {8,9}; 
+	// int lengths[1000], lengthsDefault[] = {8,9}; //! move these to be global
 
-	int k = 1, currIndexOfLEngths = 0, numOfThreads = 1 ;
+	int k = 1 /*,currIndexOfLengths = 0, numOfThreads = 1 ;*/; //! move these to be global
+
+	//* handling command line arguments
 	while(argv[k] != NULL)
     {
         if ( strcmp(argv[k], "-len") == 0 )
@@ -113,13 +117,13 @@ void main(int argc, char** argv){
 
 
 			//? adds all of the lengths inputed by the user to the array lengths
-			//! KEEP IN MIND: currIndexOfLEngths will be correct for humans in terms of the lenght of the array lengths but index-wise it will be one more.
+			//! KEEP IN MIND: currIndexOfLengths will be correct for humans in terms of the lenght of the array lengths but index-wise it will be one more.
 			while(lenOfWordByUserInput != NULL)
 			{
-				lengths[currIndexOfLEngths++] = atoi(lenOfWordByUserInput);
+				lengths[currIndexOfLengths++] = atoi(lenOfWordByUserInput);
 				lenOfWordByUserInput = strtok(NULL, ",");
 			}
-			printf("\ncurrIndexOfLEngths = %d\n", currIndexOfLEngths); //TODO: DELETE
+			printf("\ncurrIndexOfLengths = %d\n", currIndexOfLengths); //TODO: DELETE
 			printf("\nlengths[0] = %d\n", lengths[0]); //TODO: DELETE
 			printf("lengths[1] = %d\n", lengths[1]); //TODO: DELETE
 
@@ -151,6 +155,7 @@ void main(int argc, char** argv){
         k++;
     }
 	printf("\n\n--------------------------------------------------\n\n"); //TODO: DELETE
+	//* finish handling command line arguments
 	
 	//* Reading the dict.txt file and storing all of the words from dict.txt in the array dict
 	FILE* f = fopen("dict.txt", "r"); //? opening file in reading mode
