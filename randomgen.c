@@ -1,9 +1,9 @@
-// #include<stdlib.h>
-// #include<stdio.h>
-// #include<string.h>
-// #include <time.h> 
+#include<stdlib.h>
+#include<stdio.h>
+#include<string.h>
+#include <time.h> 
 
-#include <randomgen.h>
+// #include <randomgen.h>
 
 void main(int argc, char** argv){
 	if(argc != 2)

@@ -12,10 +12,11 @@ void *PrintHello(void * id) {
 
 int main (int argc, char * argv[] )
 {
-    pthread_t thread0, thread1;
-    pthread_create(&thread0, NULL, PrintHello, (void *) 0);
-    pthread_create(&thread1, NULL, PrintHello, (void *) 1);
-    pthread_join(thread0, NULL);
-    pthread_join(thread1, NULL);
+    pthread_t threadID[2];
+    // pthread_t thread0, thread1;
+    pthread_create(threadID+0, NULL, PrintHello, (void *) 0);
+    pthread_create(threadID+1, NULL, PrintHello, (void *) 1);
+    pthread_join(threadID[0], NULL);
+    pthread_join(threadID[1], NULL);
     return 0;
 }

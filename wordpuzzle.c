@@ -3,9 +3,9 @@
 #include<stdlib.h>
 #include <pthread.h>
 #include <time.h>
-#define BUFFER_SIZE 20000000L //20000000L
-#define THREADS 2
-#define LEN 9
+#define BUFFER_SIZE 10000000 //20000000L //20000000L
+#define THREADS 90
+#define LEN 3
 
 //? defining 4 flags
 int l = 0 ;
@@ -20,7 +20,7 @@ int currentIndexOfAllFoundWords;
 long timer, totalBinarySearchTime;
 pthread_mutex_t mutex;
 
-char* buffer[THREADS]; //? a pointer char array that stores up to THREADS Strings strings
+char* buffer[THREADS]; //? a pointer char array that stores up to 90 Strings
 int dictionary_size;
 char* dict[100000]; //? array of chat pointers of length 100,000
 
@@ -49,8 +49,8 @@ int binsearch(char* dictionaryWords[],int listSize,char* keyword){
 
 //* funcion que le voy a pasar al pthread_create(...)
 void* word_puzzle_solver(void* id){
-	char c = 0;
-	int i, n = BUFFER_SIZE/THREADS-LEN;
+	int i, f;
+	
 	char* buf = buffer[(int)id];
 
 	//? verbose message
@@ -59,47 +59,56 @@ void* word_puzzle_solver(void* id){
 		fprintf(stderr, "Note: Thread #%d: %s\n", (int) id, "started!"); //? prints the message to stderr
 	}
 
-	for(i = 0 ; i < n ; i++){
-		if(c) //? first pass c = 0 so this if statement does not happen.
-			buf[i + LEN - 1] = c;
-		c = buf[i + LEN]; //?
-		// printf("\nbuf[ i + LEN ] = %c\n", buf[ i + LEN ]); //TODO: DELETE
-		// printf("\nc = %c\n", c); //TODO: DELETE
-		buf[i + LEN] = '\0';
-		// printf("\nbuf + i = %s\n", buf + i); //TODO: DELETE
-
-		timer = get_nanos();
-		if(binsearch(dict, dictionary_size, buf + i) + 1)//? if search is successful!
-			printf("Thread #%d: %s\n",(int)id, buf + i);
-		timer = get_nanos() - timer;
-		
-		pthread_mutex_lock(&mutex);//!lock mutex
-		totalBinarySearchTime += timer;
-		pthread_mutex_unlock(&mutex);//! unlock mutex
-	}
-
-	//? if users asks for time (-time)
-	if(t)
+	//! wrap arounf for loop as long as the size of lengths array 
+	for(f = 0 ; f < currIndexOfLengths ; f++)
 	{
-		printf("Total Binary Search Time in seconds = %ld\n", totalBinarySearchTime / 1000000000 );
+		char c = 0;
+		int n = BUFFER_SIZE/numOfThreads-lengths[f]; //! pasarle each length store in lengths en vez de LEN
+		for(i = 0 ; i < n ; i++){
+			if(c) //? first pass c = 0 so this if statement does not happen. Because I don't have anything to restore
+				buf[i + lengths[f] - 1] = c; //? restores las character that was previously replaces to \0
+			c = buf[i + lengths[f]]; //? saves las character to c
+			buf[i + lengths[f]] = '\0'; //? replaces las character to \0
+
+			//? starts timer for binary search
+			timer = get_nanos(); 
+			//? if search is successful! ( + 1 because if search not successful it returns -1 and -1 plus 1 is 0 so FALSE)
+			if(binsearch(dict, dictionary_size, buf + i) + 1)
+			{
+				//? printing word found
+				printf("Thread #%d: %s\n",(int)id, buf + i);
+			}
+			//? calculates time for binary search
+			timer = get_nanos() - timer; 
+			
+			//? lock mutex
+			pthread_mutex_lock(&mutex);
+			//? calculates total binary serarch time
+			totalBinarySearchTime += timer;
+			//? unlock mutex
+			pthread_mutex_unlock(&mutex);
+		}
 	}
 }
 
 void main(int argc, char** argv){
 	long startTime = get_nanos(); //? start the timer
-	int thread_number, j, size = BUFFER_SIZE/THREADS;
-	char temp[100]; //? String of length 100
-	pthread_t threadID[THREADS]; //? array of threads
-	char line[1000]; //? String of length 1,000
+
+	//? initialize mutex 
+	pthread_mutex_init(&mutex,NULL);
+	
+	// int thread_number, j, size = BUFFER_SIZE/numOfThreads;
+	// char temp[100]; //? String of length 100
+	// pthread_t threadID[numOfThreads]; //? array of threads
+	// char line[1000]; //? String of length 1,000
 	//? pointer: pointer to char
-	//? holding:
-	//? lenOfWordByUserInput:
+	//? holding: holds the hole line of lengths inputed by the user Ex: 3,4
+	//? lenOfWordByUserInput: holds each length at a time
 	char * pointer, *holding, *holdingNThreads, *lenOfWordByUserInput ; 
 	//? lengths: array of integers that will hold the lengths inputed by the user after command line argument -len
 	// int lengths[1000], lengthsDefault[] = {8,9}; //! move these to be global
 
 	int k = 1 /*,currIndexOfLengths = 0, numOfThreads = 1 ;*/; //! move these to be global
-
 	//* handling command line arguments
 	while(argv[k] != NULL)
     {
@@ -139,8 +148,6 @@ void main(int argc, char** argv){
 
 			//? converting to number
 			numOfThreads = atoi(holdingNThreads);
-
-			// printf("\nnumOfThreads = %d\n", numOfThreads); //TODO: DELETE
         }
         else if ( strcmp(argv[k], "-verbose") == 0 )
         {
@@ -156,6 +163,11 @@ void main(int argc, char** argv){
     }
 	printf("\n\n--------------------------------------------------\n\n"); //TODO: DELETE
 	//* finish handling command line arguments
+
+	int thread_number, j, size = BUFFER_SIZE/numOfThreads;
+	char temp[100]; //? String of length 100
+	pthread_t threadID[numOfThreads]; //? array of threads
+	char line[1000]; //? String of length 1,000
 	
 	//* Reading the dict.txt file and storing all of the words from dict.txt in the array dict
 	FILE* f = fopen("dict.txt", "r"); //? opening file in reading mode
@@ -169,36 +181,25 @@ void main(int argc, char** argv){
 	}
 	fclose(f);
 	//* Finish reading the dic.txt file
-	
-	// printf("\ndic[ultimo] = %s\n\n", dict[dictionary_size-1]); //TODO: DELETE
 
-	printf("\nthread_number BEFORE for loop = %d\n\n", thread_number); //TODO: DELETE
-	for(thread_number = 0; thread_number < THREADS ;thread_number++)
+	printf("numOfThreads = %d\n", numOfThreads) ; //TODO: DELETE
+
+	for(thread_number = 0; thread_number < ((numOfThreads/currIndexOfLengths) * currIndexOfLengths) ; thread_number++)
 	{
-		printf("\nthread_number INSIDE for loop = %d\n\n", thread_number); //TODO: DELETE
 		buffer[thread_number] = (char*) malloc(size + 1); //? allocating memory
-
-		printf("\nsize + 1 = %d\n\n", size + 1); //TODO: DELETE
-		if(!fgets(buffer[thread_number], size + 1, stdin)) //? reading from stdin a max of size + 1 characters and storing it in buffer[thread_number]
+		
+		//? reading from stdin a max of size + 1 characters and storing it in buffer[thread_number]. It returns 1 or 0
+		if(!fgets(buffer[thread_number], size + 1, stdin)) 
 		{
-			// printf("Inside if right before error printing !fgets = %d\n", !fgets(buffer[thread_number], size + 1, stdin)); //TODO: DELETE
-
 			//? error handling
 			fprintf(stderr, "Error: can't read the input stream!\n\n");
 			break;
 		}
+		
+		// printf("\n\nbuffer[0] = \n%s\n\n", buffer[0]); //TODO: DELETE
 
-		//TODO: DELETE BLOCK
-		// printf("Outside if right after !fgets = %d\n\n", !fgets(buffer[thread_number], size + 1, stdin)); //TODO: DELETE
-		printf("\n\nbuffer[0] = \n%s\n\n", buffer[0]); //TODO: DELETE
-		printf("\nthreadID = %d\n\n", threadID); //TODO: DELETE
-		printf("\nthread_number = %d\n\n", thread_number); //TODO: DELETE
-		printf("\nthreadID + thread_number = %d\n\n", threadID + thread_number); //TODO: DELETE
-		//TODO: END OF DELETE BLOCK
-
-		//? initialize mutex
-		pthread_mutex_init(&mutex,NULL);
 		//? calls word_puzzle solver to check if word is in dictionary
+		//? it does threadID + thread_number brcause is like accessing each addess of each index of the thread array basically it works fine.
 		if(pthread_create(threadID + thread_number, NULL, word_puzzle_solver, (void *) thread_number)) 
 		{
 			//? error handling in case pthread_create is not successful
@@ -206,23 +207,30 @@ void main(int argc, char** argv){
 			break;
 		}
 	}
-
 	printf("\nthread_number = %d\n\n", thread_number); //TODO: DELETE
+
 	for(j = 0; j < thread_number;j++){
-		pthread_join(threadID[j], NULL); //? passes the thread id on index j of the array of threads called threadID. We pass NULL because we do not care about the return value. pthread_join blocks the calling thread until the specified threadID[j] terminates
+		//? passes the thread id on index j of the array of threads called threadID. We pass NULL because we do not care about the return value. pthread_join blocks the calling thread until the specified threadID[j] terminates
+		pthread_join(threadID[j], NULL); 
 
 		//? verbose message
 		if(v)
 		{
 			fprintf(stderr, "Note: Thread %d joined!\n", j);
 		}
-		pthread_mutex_destroy(&mutex);
 	}
+	pthread_mutex_destroy(&mutex);
 
 	//? verbose message
 	if(v)
 	{
-		fprintf(stderr, "Note: Total time: %ld in seconds using %d threads!\n", 
-		(get_nanos()-startTime) / 1000000000, thread_number);
+		fprintf(stderr, "Note: Total time: %ld seconds using %d threads!\n", 
+		(get_nanos()-startTime) / 1000000000, numOfThreads);
+	}
+
+	//? if users asks for time (-time)
+	if(t)
+	{
+		printf("Total Binary Search Time in seconds = %ld\n", totalBinarySearchTime / 1000000000 );
 	}
 }
