@@ -3,9 +3,8 @@
 #include<stdlib.h>
 #include <pthread.h>
 #include <time.h>
-#define BUFFER_SIZE 10000000 //20000000L //20000000L
+#define BUFFER_SIZE /* 2000000000 */ 10000000 /* 20000000L */ //20000000L
 #define THREADS 90
-#define LEN 3
 
 //? defining 4 flags
 int l = 0 ;
@@ -13,7 +12,7 @@ int nt = 0 ;
 int v = 0 ;
 int t = 0 ;
 
-int currIndexOfLengths = 0, numOfThreads = 1, lengths[1000], lengthsDefault[] = {8,9} ;
+int currIndexOfLengths = 0, numOfThreads = 1, lengths[1000];
 
 char ** allFoundWords;
 int currentIndexOfAllFoundWords;
@@ -148,6 +147,7 @@ void main(int argc, char** argv){
 
 			//? converting to number
 			numOfThreads = atoi(holdingNThreads);
+			
         }
         else if ( strcmp(argv[k], "-verbose") == 0 )
         {
@@ -163,6 +163,13 @@ void main(int argc, char** argv){
     }
 	printf("\n\n--------------------------------------------------\n\n"); //TODO: DELETE
 	//* finish handling command line arguments
+
+	if(!l)
+	{
+		lengths[0]=8;
+		lengths[1]=9;
+		currIndexOfLengths = 2 ;
+	}
 
 	int thread_number, j, size = BUFFER_SIZE/numOfThreads;
 	char temp[100]; //? String of length 100
